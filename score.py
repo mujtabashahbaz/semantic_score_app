@@ -1,29 +1,35 @@
 import streamlit as st
 import requests
+import json
 
-# Function to call OpenAI API for semantic analysis
+# Function to call OpenAI API for semantic analysis using GPT-3.5 Turbo
 def get_semantic_score(api_key, blog_content):
-    url = "https://api.openai.com/v1/completions"
+    url = "https://api.openai.com/v1/chat/completions"
     
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
     
+    # Prepare the messages for the chat model
+    messages = [
+        {"role": "system", "content": "You are an AI that evaluates the quality of written content."},
+        {"role": "user", "content": f"Evaluate the following blog post for semantic quality, relevance, cohesion, and clarity. Provide a score from 0 to 10: {blog_content}"}
+    ]
+    
     data = {
-        "model": "text-davinci-003",
-        "prompt": f"Evaluate the following blog post for semantic quality, relevance, cohesion, and clarity. Return a score from 0 to 10: {blog_content}",
+        "model": "gpt-3.5-turbo",
+        "messages": messages,
         "max_tokens": 100,
         "temperature": 0.7,
     }
     
-    response = requests.post(url, headers=headers, json=data)
+    response = requests.post(url, headers=headers, data=json.dumps(data))
     
     if response.status_code == 200:
         # Extracting the response
         result = response.json()
-        # The response will have the text with the score, let's return it
-        return result["choices"][0]["text"].strip()
+        return result["choices"][0]["message"]["content"].strip()
     else:
         return f"Error: {response.status_code} - {response.text}"
 
