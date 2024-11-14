@@ -20,7 +20,7 @@ def get_semantic_score(api_key, blog_content):
     data = {
         "model": "gpt-3.5-turbo",
         "messages": messages,
-        "max_tokens": 100,
+        "max_tokens": 200,
         "temperature": 0.7,
     }
     
